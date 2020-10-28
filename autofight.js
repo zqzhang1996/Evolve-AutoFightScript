@@ -33,6 +33,7 @@ function autoFight() {
     for (tactic = 4; tactic >= 0; tactic--) {
         let gov = 0;
         for (gov = 2; gov >= 0; gov--) {
+            if(evolve.global.civic.foreign[`gov${gov}`].mil > 100) continue;
             switch (tactic) {
                 case 0:
                     enemy = 5;
