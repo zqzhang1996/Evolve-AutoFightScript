@@ -26,39 +26,46 @@
     setInterval(autoFight, 1000);
 })();
 function autoFight() {
+    // 检测是否启用
     if(!(document.getElementById('is_autofight').value === "true")) return;
-    let army = evolve.armyRating(evolve.global.civic.garrison.max, "army", '0');
+    // 金钱大于总量一半且雇佣费用无系数时，招募雇佣兵
+    if(evolve.global.resource.Money.amount > evolve.global.resource.Money.max * 0.5 && evolve.global.civic.garrison.m_use == 0){
+        evolve.document.getElementById("garrison").__vue__.hire();
+    }
+    let army = evolve.armyRating(evolve.global.civic.garrison.max, "army", '0') * (evolve.global.race['puny'] ? 3 : 5) / 10;
     let enemy = 0;
     let tactic = 0;
-    for (tactic = 4; tactic >= 0; tactic--) {
+    for (tactic = 3; tactic >= 0; tactic--) {
         let gov = 0;
         for (gov = 2; gov >= 0; gov--) {
-            if(evolve.global.civic.foreign[`gov${gov}`].occ) continue;
+            // 不对军事力量大于50的周边国家发动围城
+            if(evolve.global.civic.foreign[`gov${gov}`].occ && evolve.global.civic.foreign[`gov${gov}`].mil > 50) continue;
+            // 不进攻军事力量大于100的周边国家
             if(evolve.global.civic.foreign[`gov${gov}`].mil > 100) continue;
             switch (tactic) {
                 case 0:
-                    enemy = 5;
+                    enemy = 10;
                     break;
                 case 1:
-                    enemy = 27.5;
+                    enemy = 50;
                     break;
                 case 2:
-                    enemy = 62.5;
+                    enemy = 100;
                     break;
                 case 3:
-                    enemy = 125;
+                    enemy = 200;
                     break;
                 case 4:
-                    enemy = 300;
+                    enemy = 500;
                     break;
             }
-            enemy *= evolve.global.civic.foreign[`gov${gov}`].mil / 100;
-            console.log("army:" + army + " enemy:" + enemy + " tactic:" + tactic + " gov:" + gov)
-            if (army >= enemy * 2) {
+            enemy = Math.floor(enemy * evolve.global.civic.foreign[`gov${gov}`].mil / 100);
+            // console.log("army:" + army + " enemy:" + enemy + " tactic:" + tactic + " gov:" + gov)
+            if (army > enemy) {
                 let raid = evolve.global.civic.garrison.workers - evolve.global.civic.garrison.wounded
                 for (; raid > 0; raid--) {
-                    console.log("raid:" + raid + " army:" + evolve.armyRating(raid, "army", '0') + " enemy:" + enemy + " tactic:" + tactic + " gov:" + gov)
-                    if (evolve.armyRating(raid, "army", '0') >= enemy * 2 && evolve.armyRating(raid - 1, "army", '0') <= enemy * 2) {
+                    // console.log("raid:" + raid + " army:" + evolve.armyRating(raid, "army", '0') + " enemy:" + enemy + " tactic:" + tactic + " gov:" + gov)
+                    if (evolve.armyRating(raid, "army", '0') * (evolve.global.race['puny'] ? 3 : 5) / 10 >= enemy && evolve.armyRating(raid - 1, "army", '0') * (evolve.global.race['puny'] ? 3 : 5) / 10 <= enemy) {
                         evolve.global.civic.garrison.tactic = tactic;
                         evolve.global.civic.garrison.raid = raid;
                         evolve.document.getElementById("garrison").__vue__.campaign(gov);
