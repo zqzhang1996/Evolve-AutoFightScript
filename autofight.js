@@ -27,7 +27,7 @@
 })();
 function autoFight() {
     if(!(document.getElementById('is_autofight').value === "true")) return;
-    let army = evolve.armyRating(evolve.global.civic.garrison.max, "army");
+    let army = evolve.armyRating(evolve.global.civic.garrison.max, "army", '0');
     let enemy = 0;
     let tactic = 0;
     for (tactic = 4; tactic >= 0; tactic--) {
@@ -53,12 +53,12 @@ function autoFight() {
                     break;
             }
             enemy *= evolve.global.civic.foreign[`gov${gov}`].mil / 100;
-            // console.log("army:" + army + " enemy:" + enemy + " tactic:" + tactic + " gov:" + gov)
+            console.log("army:" + army + " enemy:" + enemy + " tactic:" + tactic + " gov:" + gov)
             if (army >= enemy * 2) {
                 let raid = evolve.global.civic.garrison.workers - evolve.global.civic.garrison.wounded
                 for (; raid > 0; raid--) {
-                    // console.log("raid:" + raid + " army:" + evolve.armyRating(raid, "army") + " enemy:" + enemy + " tactic:" + tactic + " gov:" + gov)
-                    if (evolve.armyRating(raid, "army") >= enemy * 2 && evolve.armyRating(raid - 1, "army") <= enemy * 2) {
+                    console.log("raid:" + raid + " army:" + evolve.armyRating(raid, "army", '0') + " enemy:" + enemy + " tactic:" + tactic + " gov:" + gov)
+                    if (evolve.armyRating(raid, "army", '0') >= enemy * 2 && evolve.armyRating(raid - 1, "army", '0') <= enemy * 2) {
                         evolve.global.civic.garrison.tactic = tactic;
                         evolve.global.civic.garrison.raid = raid;
                         evolve.document.getElementById("garrison").__vue__.campaign(gov);
