@@ -33,6 +33,7 @@ function autoFight() {
     for (tactic = 4; tactic >= 0; tactic--) {
         let gov = 0;
         for (gov = 2; gov >= 0; gov--) {
+            if(evolve.global.civic.foreign[`gov${gov}`].occ) continue;
             if(evolve.global.civic.foreign[`gov${gov}`].mil > 100) continue;
             switch (tactic) {
                 case 0:
@@ -60,7 +61,7 @@ function autoFight() {
                     if (evolve.armyRating(raid, "army") >= enemy * 2 && evolve.armyRating(raid - 1, "army") <= enemy * 2) {
                         evolve.global.civic.garrison.tactic = tactic;
                         evolve.global.civic.garrison.raid = raid;
-                        evolve.document.getElementById("garrison").__vue__.campaign(0);
+                        evolve.document.getElementById("garrison").__vue__.campaign(gov);
                         return;
                     }
                 }
